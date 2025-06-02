@@ -1,8 +1,10 @@
 # HydroSmart: Sistema de riego automático
 
-**Versión**: 0.1  
+**Versión**: 0.1
+
 **Autores**: Equipo de IoT Solutions
-**Fecha**: Mayo 2025  
+
+**Fecha**: Mayo 2025
 
 ## Descripción general
 

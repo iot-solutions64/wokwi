@@ -3,7 +3,6 @@
 
 struct Event {
     int id;
-
     explicit Event(int eventId) : id(eventId) {}
     bool operator==(const Event& other) const { return id == other.id; }
 };

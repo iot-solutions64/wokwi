@@ -1,12 +1,15 @@
 #include "ModestIoT.h"
+#include "AutomaticIrrigationDevice.h"
+
+AutomaticIrrigationDevice device;
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
-  Serial.println("Hello, ESP32!");
+  Serial.println("Dispositivo de riego automático iniciado");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  delay(10); // this speeds up the simulation
+  device.getDHT().updateData();
+  device.getUltrasonic().updateData();
+  delay(2000);
 }

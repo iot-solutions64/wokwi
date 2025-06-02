@@ -6,7 +6,7 @@
 #include "Sensor.h"
 #include "Actuator.h"
 #include "Device.h"
+#include "LedActuator.h"
 #include "DHT22Sensor.h"
-#include "AutomaticIrrigationDevice.h"
 
 #endif

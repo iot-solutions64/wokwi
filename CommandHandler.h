@@ -3,7 +3,6 @@
 
 struct Command {
     int id;
-
     explicit Command(int commandId) : id(commandId) {}
     bool operator==(const Command& other) const { return id == other.id; }
 };

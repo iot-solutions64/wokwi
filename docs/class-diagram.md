@@ -36,24 +36,45 @@ abstract class Device {
 class DHT22Sensor {
     - humidity: float
     - temperature: float
+    - dht: DHTesp
     + onEvent()
     + getHumidity()
     + getTemperature()
-
+    + updateData()
 }
 
-class IrrigationActuator {
-    - status: boolean
+class UltrasonicSensor {
+    - triggerPin: int
+    - echoPin: int
+    - tankHeight: float
+    - tankArea: float
+    - currentVolume: float
+    + onEvent()
+    + getDistance()
+    + getWaterHeigh()
+    + getVolume()
+    + updateData()
+}
+
+
+class LedActuator {
+    - state: boolean
     + handleCommand()
     + turnOn()
     + turnOff()
 }
 
 class AutomaticIrrigationDevice {
-    - dht22sensor: DHT22Sensor
-    - irrigationactuator: IrrigationActuator
+    - dht22Sensor: DHT22Sensor
+    - ledActuator: LedActuator
+    - ultrasonicSensor: UltrasonicSensor
     + onEvent()
     + handleCommand()
+    + handleVolumeChange()
+    + handleEnviromentalChange()
+    + getLed()
+    + getDHT()
+    + getUltrasonic()
 }
 
 ' Relaciones de Implentacion de interfaces
@@ -64,11 +85,13 @@ CommandHandler <|.. Device
 
 ' Relaciones de Herencia
 Sensor <|-- DHT22Sensor
-Actuator <|-- IrrigationActuator
+Sensor <|-- UltrasonicSensor
+Actuator <|-- LedActuator
 Device <|-- AutomaticIrrigationDevice
 
 ' Relaciones de Composición/Agregación (dependencia)
 AutomaticIrrigationDevice --> DHT22Sensor
-AutomaticIrrigationDevice --> IrrigationActuator
+AutomaticIrrigationDevice --> UltrasonicSensor
+AutomaticIrrigationDevice --> LedActuator
 @enduml
 ```

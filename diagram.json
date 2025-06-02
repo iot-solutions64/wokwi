@@ -1,11 +1,56 @@
 {
   "version": 1,
-  "author": "Piero Delgado",
+  "author": "IoT Solutions",
   "editor": "wokwi",
   "parts": [
-    { "type": "board-esp32-devkit-v1", "id": "esp", "top": -2.72, "left": -196.8, "attrs": {} },
-    { "type": "wokwi-dht22", "id": "dht1", "top": 0.3, "left": 100.2, "attrs": {} }
+    { "type": "board-esp32-devkit-v1", "id": "esp", "top": 6.88, "left": -302.4, "attrs": {} },
+    { "type": "wokwi-breadboard-mini", "id": "bb1", "top": 75.4, "left": -108, "attrs": {} },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht1",
+      "top": -105.3,
+      "left": 148.2,
+      "attrs": { "humidity": "60", "temperature": "6.6" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": -42,
+      "left": -159,
+      "attrs": { "color": "red", "flip": "1" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 72,
+      "left": -163.75,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "ultrasonic1",
+      "top": 259.7,
+      "left": -329.1,
+      "rotate": 180,
+      "attrs": { "distance": "50" }
+    }
   ],
-  "connections": [ [ "esp:TX", "$serialMonitor:RX", "", [] ], [ "esp:RX", "$serialMonitor:TX", "", [] ] ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "esp:GND.1", "bb1:1b.f", "black", [ "h0" ] ],
+    [ "esp:3V3", "bb1:2b.g", "yellow", [ "v0" ] ],
+    [ "led1:C", "r1:1", "black", [ "v0" ] ],
+    [ "r1:2", "bb1:1b.g", "black", [ "v66", "h38.4" ] ],
+    [ "dht1:VCC", "bb1:2b.h", "yellow", [ "v0" ] ],
+    [ "ultrasonic1:GND", "bb1:1b.j", "black", [ "v-19.2", "h135.6" ] ],
+    [ "ultrasonic1:VCC", "bb1:2b.j", "yellow", [ "v-9.6", "h144" ] ],
+    [ "ultrasonic1:ECHO", "esp:D12", "green", [ "v-9.6", "h-95.2", "v-115.2" ] ],
+    [ "ultrasonic1:TRIG", "esp:D14", "blue", [ "h-134", "v-134.4" ] ],
+    [ "dht1:SDA", "esp:D18", "green", [ "v0" ] ],
+    [ "led1:A", "esp:D19", "green", [ "v0" ] ],
+    [ "dht1:GND", "bb1:1b.i", "black", [ "v0" ] ]
+  ],
   "dependencies": {}
 }
