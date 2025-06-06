@@ -2,10 +2,16 @@
 #include <Arduino.h>
 
 AutomaticIrrigationDevice::AutomaticIrrigationDevice(
-  int dht22Pin, int ledPin, int trigPin, int echoPin
+  ICommunication* communication,
+  int dht22Pin,
+  int ledPin,
+  int trigPin,
+  int echoPin
 ) : dht22Sensor(dht22Pin, this),
     ledActuator(ledPin, false, this),
-    ultrasonicSensor(trigPin, echoPin, TANK_HEIGHT_CM, TANK_AREA_CM2, this) {}
+    ultrasonicSensor(trigPin, echoPin, TANK_HEIGHT_CM, TANK_AREA_CM2, this),
+    comm(communication)
+{}
 
 void AutomaticIrrigationDevice::on(Event event) {
   if (event == UltrasonicSensor::VOLUME_CHANGED_EVENT) {
@@ -62,6 +68,33 @@ void AutomaticIrrigationDevice::handleEnvironmentalChange() {
     if (ledActuator.getState()) {
       ledActuator.handle(LedActuator::TURN_OFF_COMMAND);
       Serial.println("Condición normal: Riego desactivado.");
+    }
+  }
+}
+
+void AutomaticIrrigationDevice::updateSensors() {
+  dht22Sensor.updateData();
+  ultrasonicSensor.updateData();
+}
+
+void AutomaticIrrigationDevice::sendSensorData() {
+  if (comm && comm->isConnected()) {
+    float temp = dht22Sensor.getTemperature();
+    float hum = dht22Sensor.getHumidity();
+    float volume = ultrasonicSensor.getVolume();
+    float volumePercent = (volume / TANK_TOTAL_VOLUME_LITERS) * 100.0;
+
+    String json = "{";
+    json += "\"temperature\":" + String(temp) + ",";
+    json += "\"humidity\":" + String(hum) + ",";
+    json += "\"tank_volume_liters\":" + String(volume) + ",";
+    json += "\"tank_volume_percent\":" + String(volumePercent);
+    json += "}";
+
+    if (comm->sendData(json)) {
+      Serial.println("Datos enviados al servidor.");
+    } else {
+      Serial.println("Error enviando datos.");
     }
   }
 }

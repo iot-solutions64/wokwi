@@ -12,6 +12,16 @@ interface CommandHandler {
     + handleCommand()
 }
 
+interface ICommunication {
+    + begin()
+    + handle()
+    + isConnected(): bool
+    + getAddress(): String
+    + sendData(data: String): bool
+    + hasData(): bool
+    + receiveData(): String
+}
+
 ' Clases abstractas
 abstract class Sensor {
     # pin: int
@@ -56,7 +66,6 @@ class UltrasonicSensor {
     + updateData()
 }
 
-
 class LedActuator {
     - state: boolean
     + handleCommand()
@@ -68,6 +77,7 @@ class AutomaticIrrigationDevice {
     - dht22Sensor: DHT22Sensor
     - ledActuator: LedActuator
     - ultrasonicSensor: UltrasonicSensor
+    - comm: ICommunication
     + onEvent()
     + handleCommand()
     + handleVolumeChange()
@@ -75,23 +85,44 @@ class AutomaticIrrigationDevice {
     + getLed()
     + getDHT()
     + getUltrasonic()
+    + updateSensors()
+    + sendSensorData()
 }
 
-' Relaciones de Implentacion de interfaces
+class WiFiManager {
+    - ssid: const char*
+    - password: const char*
+    - serverUrl: String
+    - lastReconnectAttempt: unsigned long
+    - reconnectInterval: const unsigned long
+    - rxBuffer: String
+    + begin()
+    + handle()
+    + isConnected(): bool
+    + getAddress(): String
+    + sendData(data: String): bool
+    + hasData(): bool
+    + receiveData(): String
+}
+
+' Relaciones de implementación de interfaces
 EventHandler <|.. Sensor
 CommandHandler <|.. Actuator
 EventHandler <|.. Device
 CommandHandler <|.. Device
+ICommunication <|.. WiFiManager
 
-' Relaciones de Herencia
+' Relaciones de herencia
 Sensor <|-- DHT22Sensor
 Sensor <|-- UltrasonicSensor
 Actuator <|-- LedActuator
 Device <|-- AutomaticIrrigationDevice
 
-' Relaciones de Composición/Agregación (dependencia)
+' Relaciones de composición/agregación (dependencia)
 AutomaticIrrigationDevice --> DHT22Sensor
 AutomaticIrrigationDevice --> UltrasonicSensor
 AutomaticIrrigationDevice --> LedActuator
+AutomaticIrrigationDevice --> ICommunication
+
 @enduml
 ```
