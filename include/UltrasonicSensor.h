@@ -2,6 +2,7 @@
 #define ULTRASONIC_SENSOR_H
 
 #include "Sensor.h"
+#include <Arduino.h>
 
 class UltrasonicSensor : public Sensor {
 private:

@@ -3,6 +3,7 @@
 
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <ArduinoJson.h>
 #include "ICommunication.h"
 
 class WiFiManager : public ICommunication {

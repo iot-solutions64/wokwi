@@ -1,5 +1,4 @@
 #include "AutomaticIrrigationDevice.h"
-#include <Arduino.h>
 
 AutomaticIrrigationDevice::AutomaticIrrigationDevice(
   ICommunication* communication,
@@ -82,16 +81,15 @@ void AutomaticIrrigationDevice::sendSensorData() {
     float temp = dht22Sensor.getTemperature();
     float hum = dht22Sensor.getHumidity();
     float volume = ultrasonicSensor.getVolume();
-    float volumePercent = (volume / TANK_TOTAL_VOLUME_LITERS) * 100.0;
 
-    String json = "{";
-    json += "\"temperature\":" + String(temp) + ",";
-    json += "\"humidity\":" + String(hum) + ",";
-    json += "\"tank_volume_liters\":" + String(volume) + ",";
-    json += "\"tank_volume_percent\":" + String(volumePercent);
-    json += "}";
+    JsonDocument data;
+    data["temperature"] = temp;
+    data["humidity"] = hum;
+    data["volume"] = volume;
+    String resource;
+    serializeJson(data, resource);
 
-    if (comm->sendData(json)) {
+    if (comm->sendData(resource)) {
       Serial.println("Datos enviados al servidor.");
     } else {
       Serial.println("Error enviando datos.");

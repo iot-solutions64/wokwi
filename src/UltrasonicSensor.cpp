@@ -1,5 +1,4 @@
 #include "UltrasonicSensor.h"
-#include <Arduino.h>
 
 const Event UltrasonicSensor::VOLUME_CHANGED_EVENT(UltrasonicSensor::VOLUME_CHANGED_EVENT_ID);
 

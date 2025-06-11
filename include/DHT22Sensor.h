@@ -3,6 +3,7 @@
 
 #include "Sensor.h"
 #include <DHTesp.h>
+#include <Arduino.h>
 
 class DHT22Sensor : public Sensor {
 private:

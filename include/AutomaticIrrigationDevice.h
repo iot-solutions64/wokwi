@@ -1,6 +1,11 @@
 #ifndef AUTOMATIC_IRRIGATION_DEVICE_H
 #define AUTOMATIC_IRRIGATION_DEVICE_H
 
+#include <Arduino.h>
+#include <ArduinoJson.h>
+#include <HTTPClient.h>
+#include <WiFi.h>
+
 #include "Device.h"
 #include "DHT22Sensor.h"
 #include "LedActuator.h"
@@ -12,7 +17,7 @@ private:
   DHT22Sensor dht22Sensor;
   LedActuator ledActuator;
   UltrasonicSensor ultrasonicSensor;
-  ICommunication* comm; // Comunicación (WiFiManager u otra)
+  ICommunication* comm; // Comunicación (WiFiManager, MQTTManager u otra)
 
   static constexpr float TEMPERATURE_THRESHOLD = 30.0; // °C
   static constexpr float HUMIDITY_THRESHOLD = 25.0;    // %
