@@ -1,30 +1,32 @@
 #include "ModestIoT.h"
 #include "AutomaticIrrigationDevice.h"
-#include "WiFiManager.h"
+#include "MQTTManager.h"
 
-// Configuración WiFi
+// Configuración WiFi y MQTT
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
-const String edgeApiUrl = "https://localhost:3000/device/data";
+const char* mqttServer = "test.mosquitto.org";
+const uint16_t mqttPort = 1883;
+const char* mqttTopic = "iot/irrigation/data/david_soto_salis";
 // Intervalos de tiempo
 unsigned long lastSensorUpdate = 0;
 unsigned long lastDataSend = 0;
 const unsigned long SENSOR_UPDATE_INTERVAL = 2000; // 2 segundos
 const unsigned long SEND_DATA_INTERVAL = 30000;  // 30 segundos
 
-WiFiManager wifiManager(ssid, password, edgeApiUrl);
-AutomaticIrrigationDevice device(&wifiManager);
+MQTTManager mqttManager(ssid, password, mqttServer, mqttPort, mqttTopic);
+AutomaticIrrigationDevice device(&mqttManager);
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Dispositivo de riego automático iniciado");
 
-  // Inicializar WiFi
-  wifiManager.begin();
+  // Inicializar WiFi y MQTT
+  mqttManager.begin();
 }
 
 void loop() {
-  wifiManager.handle();  // Siempre mantener la conexión activa
+  mqttManager.handle();  // Siempre mantener la conexión activa
 
   unsigned long currentTime = millis();
 
