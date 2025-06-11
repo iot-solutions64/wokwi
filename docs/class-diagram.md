@@ -20,6 +20,7 @@ interface ICommunication {
     + sendData(data: string)
     + hasData()
     + receiveData()
+    + receiveData(url: string)
 }
 
 ' Clases abstractas
@@ -121,6 +122,7 @@ class MQTTManager {
     + sendData(data: string)
     + hasData()
     + receiveData()
+    + receiveData(url: string)
 }
 
 ' Relaciones de implementación de interfaces

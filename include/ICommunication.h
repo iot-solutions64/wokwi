@@ -13,6 +13,7 @@ public:
     virtual bool sendData(const String& data) = 0;
     virtual bool hasData() = 0;
     virtual String receiveData() = 0;
+    virtual String receiveData(const String& url) = 0;
 };
 
 #endif

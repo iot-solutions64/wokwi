@@ -52,13 +52,30 @@ void AutomaticIrrigationDevice::handleEnvironmentalChange() {
 
   Serial.printf("Lectura ambiental -> Temp: %.2f°C | Hum: %.2f%% | Vol: %.2fL (%.1f%%)\n",
                 temperature, humidity, volume, volumePercent);
-
   if (volumePercent <= TANK_MIN_VOLUME_THRESHOLD) {
-    Serial.println("Nivel de agua crítico. Se omite evaluación ambiental.");
+    Serial.println("Nivel de agua crítico. Se cancela el riego.");
     return;
   }
+  bool validLocalConditions = (temperature >= TEMPERATURE_THRESHOLD || humidity <= HUMIDITY_THRESHOLD);
+  int edgeResult = validateIrrigationConditions();
+  bool shouldIrrigate = false;
 
-  if (temperature >= TEMPERATURE_THRESHOLD || humidity <= HUMIDITY_THRESHOLD) {
+  switch (edgeResult) {
+    case 0: // Edge dice no regar
+      Serial.println("Edge API indica no regar.");
+      shouldIrrigate = false;
+      break;
+    case 1: // Edge dice regar
+      shouldIrrigate = validLocalConditions;
+      break;
+    case 2: // Error en el endpoint
+    default:
+      Serial.println("Edge API no disponible. Usando solo condiciones locales.");
+      shouldIrrigate = validLocalConditions;
+      break;
+  }
+
+  if (shouldIrrigate) {
     if (!ledActuator.getState()) {
       ledActuator.handle(LedActuator::TURN_ON_COMMAND);
       Serial.println("Condición anómala: Activando riego.");
@@ -95,6 +112,25 @@ void AutomaticIrrigationDevice::sendSensorData() {
       Serial.println("Error enviando datos.");
     }
   }
+}
+
+int AutomaticIrrigationDevice::validateIrrigationConditions() {
+    if (!comm) return 2;
+
+    String response = comm->receiveData(IRRIGATION_STATUS_ENDPOINT);
+    if (response.isEmpty()) return 2;
+
+    JsonDocument data;
+    DeserializationError error = deserializeJson(data, response);
+    if (error) {
+        Serial.print("Error parsing JSON: ");
+        Serial.println(error.c_str());
+        return 2;
+    }
+
+    bool shouldIrrigate = data["active"];
+    Serial.printf("Respuesta Edge API para riego: %s\n", shouldIrrigate ? "ACTIVAR" : "NO ACTIVAR");
+    return shouldIrrigate ? 1 : 0;
 }
 
 DHT22Sensor& AutomaticIrrigationDevice::getDHT() {

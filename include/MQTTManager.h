@@ -3,6 +3,8 @@
 
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <Arduino.h>
+#include <HTTPClient.h>
 #include "ICommunication.h"
 
 class MQTTManager : public ICommunication {
@@ -17,7 +19,6 @@ private:
     String rxBuffer;
     unsigned long lastReconnectAttempt;
     const unsigned long reconnectInterval;
-
     void reconnect();
 
 public:
@@ -29,6 +30,7 @@ public:
     bool sendData(const String& data) override;
     bool hasData() override;
     String receiveData() override;
+    String receiveData(const String& url) override;
 };
 
 #endif

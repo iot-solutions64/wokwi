@@ -1,5 +1,4 @@
 #include "MQTTManager.h"
-#include <Arduino.h>
 
 MQTTManager::MQTTManager(const char* ssid, const char* password, const char* mqttServer, uint16_t mqttPort, const char* mqttTopic)
     : ssid(ssid), password(password), mqttServer(mqttServer), mqttPort(mqttPort), mqttTopic(mqttTopic),
@@ -81,4 +80,28 @@ String MQTTManager::receiveData() {
     String data = rxBuffer;
     rxBuffer = "";
     return data;
+}
+
+String MQTTManager::receiveData(const String& url) {
+    if (!isConnected()) {
+        Serial.println("No hay conexión para consultar el endpoint");
+        return "";
+    }
+
+    HTTPClient http;
+    http.begin(url);
+    http.addHeader("Content-Type", "application/json");
+
+    Serial.println("Consultando endpoint...");
+    int httpCode = http.GET();
+
+    if (httpCode == 200) {
+        String payload = http.getString();
+        http.end();
+        return payload;
+    } else {
+        Serial.printf("Error consultando endpoint: %d\n", httpCode);
+        http.end();
+        return "";
+    }
 }

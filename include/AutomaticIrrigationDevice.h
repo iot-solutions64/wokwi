@@ -25,7 +25,9 @@ private:
   static constexpr float TANK_HEIGHT_CM = 100.0;       // cm
   static constexpr float TANK_AREA_CM2 = 1000.0;       // cm²
   static constexpr float TANK_TOTAL_VOLUME_LITERS = (TANK_HEIGHT_CM * TANK_AREA_CM2) / 1000.0;
+  static constexpr const char* IRRIGATION_STATUS_ENDPOINT = "https://orange-needles-knock.loca.lt/irrigation/status";
   float calculateTankVolumePercent(float distanceCm);
+  int validateIrrigationConditions();
 
 public:
   static const int DHT22_PIN = 18;
