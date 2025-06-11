@@ -15,11 +15,11 @@ interface CommandHandler {
 interface ICommunication {
     + begin()
     + handle()
-    + isConnected(): bool
-    + getAddress(): String
-    + sendData(data: String): bool
-    + hasData(): bool
-    + receiveData(): String
+    + isConnected()
+    + getAddress()
+    + sendData(data: string)
+    + hasData()
+    + receiveData()
 }
 
 ' Clases abstractas
@@ -90,19 +90,37 @@ class AutomaticIrrigationDevice {
 }
 
 class WiFiManager {
-    - ssid: const char*
-    - password: const char*
-    - serverUrl: String
-    - lastReconnectAttempt: unsigned long
-    - reconnectInterval: const unsigned long
-    - rxBuffer: String
+    - ssid: char*
+    - password: char*
+    - serverUrl: string
+    - lastReconnectAttempt: long
+    - reconnectInterval: long
+    - rxBuffer: string
     + begin()
     + handle()
-    + isConnected(): bool
-    + getAddress(): String
-    + sendData(data: String): bool
-    + hasData(): bool
-    + receiveData(): String
+    + isConnected()
+    + getAddress()
+    + sendData(data: string)
+    + hasData()
+    + receiveData()
+}
+
+class MQTTManager {
+    - ssid: char*
+    - password: char*
+    - mqttServer: char*
+    - mqttPort: uint16_t
+    - mqttTopic: char*
+    - rxBuffer: string
+    - lastReconnectAttempt: long
+    - reconnectInterval: long
+    + begin()
+    + handle()
+    + isConnected()
+    + getAddress()
+    + sendData(data: string)
+    + hasData()
+    + receiveData()
 }
 
 ' Relaciones de implementación de interfaces
@@ -110,6 +128,7 @@ EventHandler <|.. Sensor
 CommandHandler <|.. Actuator
 EventHandler <|.. Device
 CommandHandler <|.. Device
+ICommunication <|.. MQTTManager
 ICommunication <|.. WiFiManager
 
 ' Relaciones de herencia
