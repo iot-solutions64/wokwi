@@ -37,9 +37,9 @@ void AutomaticIrrigationDevice::handleVolumeChange() {
   if (volumePercent <= TANK_MIN_VOLUME_THRESHOLD) {
     if (ledActuator.getState()) {
       ledActuator.handle(LedActuator::TURN_OFF_COMMAND);
-      Serial.println("Nivel crítico de agua. Riego cancelado.");
+      Serial.print("Nivel crítico de agua. Riego cancelado.");
     } else {
-      Serial.println("Nivel crítico de agua. Riego ya está desactivado.");
+      Serial.print("Nivel crítico de agua. Riego ya está desactivado.");
     }
   }
 }
@@ -53,37 +53,36 @@ void AutomaticIrrigationDevice::handleEnvironmentalChange() {
   Serial.printf("Lectura ambiental -> Temp: %.2f°C | Hum: %.2f%% | Vol: %.2fL (%.1f%%)\n",
                 temperature, humidity, volume, volumePercent);
   if (volumePercent <= TANK_MIN_VOLUME_THRESHOLD) {
-    Serial.println("Nivel de agua crítico. Se cancela el riego.");
+    Serial.print("Nivel de agua crítico. Se cancela el riego.");
     return;
   }
-  bool validLocalConditions = (temperature >= TEMPERATURE_THRESHOLD || humidity <= HUMIDITY_THRESHOLD);
+  bool hasInvalidLocalConditions = (temperature >= temperatureThreshold || humidity <= humidityThreshold);
   int edgeResult = validateIrrigationConditions();
   bool shouldIrrigate = false;
 
   switch (edgeResult) {
     case 0: // Edge dice no regar
-      Serial.println("Edge API indica no regar.");
+      Serial.print("Edge API indica no regar.");
       shouldIrrigate = false;
       break;
     case 1: // Edge dice regar
-      shouldIrrigate = validLocalConditions;
+      shouldIrrigate = true;
       break;
     case 2: // Error en el endpoint
     default:
-      Serial.println("Edge API no disponible. Usando solo condiciones locales.");
-      shouldIrrigate = validLocalConditions;
+      Serial.print("Edge API no disponible. Usando solo condiciones locales.");
+      shouldIrrigate = hasInvalidLocalConditions;
       break;
   }
-
   if (shouldIrrigate) {
     if (!ledActuator.getState()) {
       ledActuator.handle(LedActuator::TURN_ON_COMMAND);
-      Serial.println("Condición anómala: Activando riego.");
+      Serial.print("Condición anómala: Activando riego.");
     }
   } else {
     if (ledActuator.getState()) {
       ledActuator.handle(LedActuator::TURN_OFF_COMMAND);
-      Serial.println("Condición normal: Riego desactivado.");
+      Serial.print("Condición normal: Riego desactivado.");
     }
   }
 }
@@ -105,12 +104,32 @@ void AutomaticIrrigationDevice::sendSensorData() {
     data["volume"] = volume;
     String resource;
     serializeJson(data, resource);
+  }
+}
 
-    if (comm->sendData(resource)) {
-      Serial.println("Datos enviados al servidor.");
-    } else {
-      Serial.println("Error enviando datos.");
+void AutomaticIrrigationDevice::getThresholdData() {
+  if (comm && comm->isConnected()) {
+    if (!comm) return;
+
+    String response = comm->receiveData(IRRIGATION_THRESHOLDS_ENDPOINT);
+    if (response.isEmpty()) {
+      Serial.print("Error recuperando datos de los limites para validacion local.");
+      return;
     }
+
+    JsonDocument data;
+    DeserializationError error = deserializeJson(data, response);
+    if (error) {
+        Serial.print("Error parsing JSON: ");
+        Serial.println(error.c_str());
+        return;
+    }
+    // Set thresholds
+    temperatureThreshold = data["temperature_max"];
+    humidityThreshold = data["humidity_min"];
+
+    Serial.print("Valores de validacion local actualizados.");
+    return;
   }
 }
 

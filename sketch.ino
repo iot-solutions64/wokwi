@@ -2,7 +2,7 @@
 #include "AutomaticIrrigationDevice.h"
 #include "MQTTManager.h"
 
-// Configuración WiFi y MQTT
+// Configuración WiFi
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 const char* mqttServer = "test.mosquitto.org";
@@ -11,8 +11,10 @@ const char* mqttTopic = "iot/irrigation/data/david_soto_salis";
 // Intervalos de tiempo
 unsigned long lastSensorUpdate = 0;
 unsigned long lastDataSend = 0;
-const unsigned long SENSOR_UPDATE_INTERVAL = 2000; // 2 segundos
-const unsigned long SEND_DATA_INTERVAL = 30000;  // 30 segundos
+unsigned long lastGetThreshold = 0;
+const unsigned long SENSOR_UPDATE_INTERVAL = 1000; // 1 segundos
+const unsigned long SEND_DATA_INTERVAL = 15000;  // 15 segundos
+const unsigned long GET_THRESHOLD_INTERVAL = 60000; // 1 minuto
 
 MQTTManager mqttManager(ssid, password, mqttServer, mqttPort, mqttTopic);
 AutomaticIrrigationDevice device(&mqttManager);
@@ -21,7 +23,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Dispositivo de riego automático iniciado");
 
-  // Inicializar WiFi y MQTT
+  // Inicializar WiFi
   mqttManager.begin();
 }
 
@@ -40,6 +42,12 @@ void loop() {
   if (currentTime - lastDataSend >= SEND_DATA_INTERVAL) {
     lastDataSend = currentTime;
     device.sendSensorData();
+  }
+
+  // Obtener limites de temperatura y humedad
+  if (currentTime - lastDataSend >= GET_THRESHOLD_INTERVAL) {
+    lastGetThreshold = currentTime;
+    device.getThresholdData();
   }
 
   // Delay para evitar sobrecarga

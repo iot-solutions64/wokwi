@@ -19,13 +19,13 @@ private:
   UltrasonicSensor ultrasonicSensor;
   ICommunication* comm; // Comunicación (WiFiManager, MQTTManager u otra)
 
-  static constexpr float TEMPERATURE_THRESHOLD = 30.0; // °C
-  static constexpr float HUMIDITY_THRESHOLD = 25.0;    // %
+  float humidityThreshold = 25.0;    // %
   static constexpr float TANK_MIN_VOLUME_THRESHOLD = 5.0; // %
   static constexpr float TANK_HEIGHT_CM = 100.0;       // cm
   static constexpr float TANK_AREA_CM2 = 1000.0;       // cm²
   static constexpr float TANK_TOTAL_VOLUME_LITERS = (TANK_HEIGHT_CM * TANK_AREA_CM2) / 1000.0;
-  static constexpr const char* IRRIGATION_STATUS_ENDPOINT = "https://orange-needles-knock.loca.lt/irrigation/status";
+  static constexpr const char* IRRIGATION_STATUS_ENDPOINT = "https://endpoint.com/irrigation/status";
+  static constexpr const char* IRRIGATION_THRESHOLDS_ENDPOINT = "https://endpoint.com/irrigation/thresholds";
   float calculateTankVolumePercent(float distanceCm);
   int validateIrrigationConditions();
 
@@ -50,6 +50,7 @@ public:
 
   void updateSensors();
   void sendSensorData();
+  void getThresholdData();
 
   DHT22Sensor& getDHT();
   LedActuator& getLed();
