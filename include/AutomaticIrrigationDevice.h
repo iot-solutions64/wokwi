@@ -19,6 +19,7 @@ private:
   UltrasonicSensor ultrasonicSensor;
   ICommunication* comm; // Comunicación (WiFiManager, MQTTManager u otra)
 
+  float temperatureThreshold = 30.0; // °C
   float humidityThreshold = 25.0;    // %
   static constexpr float TANK_MIN_VOLUME_THRESHOLD = 5.0; // %
   static constexpr float TANK_HEIGHT_CM = 100.0;       // cm
