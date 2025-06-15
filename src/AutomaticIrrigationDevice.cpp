@@ -104,6 +104,12 @@ void AutomaticIrrigationDevice::sendSensorData() {
     data["volume"] = volume;
     String resource;
     serializeJson(data, resource);
+
+    if (comm->sendData(resource)) {
+      Serial.println("Datos enviados al servidor.");
+    } else {
+      Serial.println("Error enviando datos.");
+    }
   }
 }
 
