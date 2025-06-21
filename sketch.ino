@@ -7,7 +7,7 @@ const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 const char* mqttServer = "test.mosquitto.org";
 const uint16_t mqttPort = 1883;
-const char* mqttTopic = "iot/irrigation/data/david_soto_salis";
+const char* mqttTopic = "iot/irrigation/data/iot-solutions64";
 // Intervalos de tiempo
 unsigned long lastSensorUpdate = 0;
 unsigned long lastDataSend = 0;

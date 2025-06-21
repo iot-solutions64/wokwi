@@ -115,8 +115,6 @@ void AutomaticIrrigationDevice::sendSensorData() {
 
 void AutomaticIrrigationDevice::getThresholdData() {
   if (comm && comm->isConnected()) {
-    if (!comm) return;
-
     String response = comm->receiveData(IRRIGATION_THRESHOLDS_ENDPOINT);
     if (response.isEmpty()) {
       Serial.print("Error recuperando datos de los limites para validacion local.");
