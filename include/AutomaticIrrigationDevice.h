@@ -8,14 +8,14 @@
 
 #include "Device.h"
 #include "DHT22Sensor.h"
-#include "LedActuator.h"
+#include "RelayActuator.h"
 #include "UltrasonicSensor.h"
 #include "ICommunication.h"
 
 class AutomaticIrrigationDevice : public Device {
 private:
   DHT22Sensor dht22Sensor;
-  LedActuator ledActuator;
+  RelayActuator relayActuator;
   UltrasonicSensor ultrasonicSensor;
   ICommunication* comm; // Comunicación (WiFiManager, MQTTManager u otra)
 
@@ -25,21 +25,21 @@ private:
   static constexpr float TANK_HEIGHT_CM = 100.0;       // cm
   static constexpr float TANK_AREA_CM2 = 1000.0;       // cm²
   static constexpr float TANK_TOTAL_VOLUME_LITERS = (TANK_HEIGHT_CM * TANK_AREA_CM2) / 1000.0;
-  static constexpr const char* IRRIGATION_STATUS_ENDPOINT = "https://endpoint.com/irrigation/status";
-  static constexpr const char* IRRIGATION_THRESHOLDS_ENDPOINT = "https://endpoint.com/irrigation/thresholds";
+  static constexpr const char* IRRIGATION_STATUS_ENDPOINT = "https://loose-readers-deny.loca.lt/irrigation/status";
+  static constexpr const char* IRRIGATION_THRESHOLDS_ENDPOINT = "https://loose-readers-deny.loca.lt/irrigation/thresholds";
   float calculateTankVolumePercent(float distanceCm);
   int validateIrrigationConditions();
 
 public:
   static const int DHT22_PIN = 18;
-  static const int LED_PIN = 19;
+  static const int RELAY_PIN = 19;
   static const int TRIGGER_PIN = 14;
   static const int ECHO_PIN = 12;
 
   AutomaticIrrigationDevice(
     ICommunication* communication,
     int dht22Pin = DHT22_PIN,
-    int ledPin = LED_PIN,
+    int relayPin = RELAY_PIN,
     int trigPin = TRIGGER_PIN,
     int echoPin = ECHO_PIN
   );
@@ -54,7 +54,7 @@ public:
   void getThresholdData();
 
   DHT22Sensor& getDHT();
-  LedActuator& getLed();
+  RelayActuator& getRelay();
   UltrasonicSensor& getUltrasonic();
 };
 

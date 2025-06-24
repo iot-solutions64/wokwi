@@ -3,11 +3,11 @@
 AutomaticIrrigationDevice::AutomaticIrrigationDevice(
   ICommunication* communication,
   int dht22Pin,
-  int ledPin,
+  int relayPin,
   int trigPin,
   int echoPin
 ) : dht22Sensor(dht22Pin, this),
-    ledActuator(ledPin, false, this),
+    relayActuator(relayPin, false, this),
     ultrasonicSensor(trigPin, echoPin, TANK_HEIGHT_CM, TANK_AREA_CM2, this),
     comm(communication)
 {}
@@ -21,10 +21,9 @@ void AutomaticIrrigationDevice::on(Event event) {
 }
 
 void AutomaticIrrigationDevice::handle(Command command) {
-  if (command == LedActuator::TOGGLE_LED_COMMAND || 
-      command == LedActuator::TURN_ON_COMMAND || 
-      command == LedActuator::TURN_OFF_COMMAND) {
-    Serial.printf("LED state: %d\n", ledActuator.getState());
+  if (command == RelayActuator::TURN_ON_COMMAND || 
+      command == RelayActuator::TURN_OFF_COMMAND) {
+    Serial.printf("Relay state: %d\n", relayActuator.getState());
   }
 }
 
@@ -35,8 +34,8 @@ void AutomaticIrrigationDevice::handleVolumeChange() {
   Serial.printf("Volumen actualizado: %.2fL (%.1f%%)\n", volume, volumePercent);
 
   if (volumePercent <= TANK_MIN_VOLUME_THRESHOLD) {
-    if (ledActuator.getState()) {
-      ledActuator.handle(LedActuator::TURN_OFF_COMMAND);
+    if (relayActuator.getState()) {
+      relayActuator.handle(RelayActuator::TURN_OFF_COMMAND);
       Serial.print("Nivel crítico de agua. Riego cancelado.");
     } else {
       Serial.print("Nivel crítico de agua. Riego ya está desactivado.");
@@ -75,13 +74,13 @@ void AutomaticIrrigationDevice::handleEnvironmentalChange() {
       break;
   }
   if (shouldIrrigate) {
-    if (!ledActuator.getState()) {
-      ledActuator.handle(LedActuator::TURN_ON_COMMAND);
+    if (!relayActuator.getState()) {
+      relayActuator.handle(RelayActuator::TURN_ON_COMMAND);
       Serial.print("Condición anómala: Activando riego.");
     }
   } else {
-    if (ledActuator.getState()) {
-      ledActuator.handle(LedActuator::TURN_OFF_COMMAND);
+    if (relayActuator.getState()) {
+      relayActuator.handle(RelayActuator::TURN_OFF_COMMAND);
       Serial.print("Condición normal: Riego desactivado.");
     }
   }
@@ -160,8 +159,8 @@ DHT22Sensor& AutomaticIrrigationDevice::getDHT() {
   return dht22Sensor;
 }
 
-LedActuator& AutomaticIrrigationDevice::getLed() {
-  return ledActuator;
+RelayActuator& AutomaticIrrigationDevice::getRelay() {
+  return relayActuator;
 }
 
 UltrasonicSensor& AutomaticIrrigationDevice::getUltrasonic() {
