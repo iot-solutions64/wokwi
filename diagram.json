@@ -10,7 +10,7 @@
       "id": "dht1",
       "top": -66.9,
       "left": 148.2,
-      "attrs": { "humidity": "41.5", "temperature": "6.5" }
+      "attrs": { "humidity": "8.5", "temperature": "6.5" }
     },
     {
       "type": "wokwi-hc-sr04",
@@ -36,21 +36,12 @@
       "attrs": { "value": "1000" }
     },
     {
-      "type": "wokwi-resistor",
-      "id": "r2",
-      "top": 42.35,
-      "left": 470.4,
-      "attrs": { "value": "220" }
-    },
-    {
       "type": "wokwi-led",
       "id": "led1",
-      "top": -138,
-      "left": -44.2,
+      "top": -157.2,
+      "left": -43.8,
       "attrs": { "color": "red", "flip": "1" }
-    },
-    { "type": "wokwi-vcc", "id": "vcc1", "top": -181.64, "left": -172.8, "attrs": {} },
-    { "type": "wokwi-gnd", "id": "gnd1", "top": -57.6, "left": -29.4, "attrs": {} }
+    }
   ],
   "connections": [
     [ "esp:TX0", "$serialMonitor:RX", "", [] ],
@@ -69,8 +60,8 @@
     [ "relay1:VCC", "bb1:2t.c", "yellow", [ "v0" ] ],
     [ "r1:1", "relay1:NO", "green", [ "v0" ] ],
     [ "led1:A", "r1:2", "green", [ "v0" ] ],
-    [ "relay1:COM", "vcc1:VCC", "purple", [ "h-1.4", "v-49.2" ] ],
-    [ "led1:C", "gnd1:GND", "black", [ "v0" ] ]
+    [ "led1:C", "esp:GND.2", "black", [ "v0" ] ],
+    [ "relay1:COM", "esp:VIN", "yellow", [ "v200.4", "h-155" ] ]
   ],
   "dependencies": {}
 }
