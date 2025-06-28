@@ -33,8 +33,8 @@ private:
 public:
   static const int DHT22_PIN = 18;
   static const int RELAY_PIN = 19;
-  static const int TRIGGER_PIN = 14;
-  static const int ECHO_PIN = 12;
+  static const int TRIGGER_PIN = 12;
+  static const int ECHO_PIN = 14;
 
   AutomaticIrrigationDevice(
     ICommunication* communication,

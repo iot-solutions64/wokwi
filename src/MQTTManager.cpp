@@ -84,7 +84,7 @@ String MQTTManager::receiveData() {
 
 String MQTTManager::receiveData(const String& url) {
     if (!isConnected()) {
-        Serial.println("No hay conexión para consultar el endpoint");
+        Serial.println("No hay conexión para consultar el endpoint.");
         return "";
     }
 

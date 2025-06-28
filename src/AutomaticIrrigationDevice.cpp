@@ -61,7 +61,7 @@ void AutomaticIrrigationDevice::handleEnvironmentalChange() {
 
   switch (edgeResult) {
     case 0: // Edge dice no regar
-      Serial.print("Edge API indica no regar.");
+      Serial.println("Edge API indica no regar.");
       shouldIrrigate = false;
       break;
     case 1: // Edge dice regar
@@ -69,19 +69,19 @@ void AutomaticIrrigationDevice::handleEnvironmentalChange() {
       break;
     case 2: // Error en el endpoint
     default:
-      Serial.print("Edge API no disponible. Usando solo condiciones locales.");
+      Serial.println("Edge API no disponible. Usando solo condiciones locales.");
       shouldIrrigate = hasInvalidLocalConditions;
       break;
   }
   if (shouldIrrigate) {
     if (!relayActuator.getState()) {
       relayActuator.handle(RelayActuator::TURN_ON_COMMAND);
-      Serial.print("Condición anómala: Activando riego.");
+      Serial.println("Condición anómala: Activando riego.");
     }
   } else {
     if (relayActuator.getState()) {
       relayActuator.handle(RelayActuator::TURN_OFF_COMMAND);
-      Serial.print("Condición normal: Riego desactivado.");
+      Serial.println("Condición normal: Riego desactivado.");
     }
   }
 }
@@ -116,7 +116,7 @@ void AutomaticIrrigationDevice::getThresholdData() {
   if (comm && comm->isConnected()) {
     String response = comm->receiveData(IRRIGATION_THRESHOLDS_ENDPOINT);
     if (response.isEmpty()) {
-      Serial.print("Error recuperando datos de los limites para validacion local.");
+      Serial.println("Error recuperando datos de los limites para validacion local.");
       return;
     }
 
