@@ -20,7 +20,7 @@ private:
     unsigned long lastReconnectAttempt;
     const unsigned long reconnectInterval;
     void reconnect();
-
+    void setData(const String& message);
 public:
     MQTTManager(const char* ssid, const char* password, const char* mqttServer, uint16_t mqttPort, const char* mqttTopic);
     void begin() override;
@@ -30,7 +30,6 @@ public:
     bool sendData(const String& data) override;
     bool hasData() override;
     String receiveData() override;
-    String receiveData(const String& url) override;
 };
 
 #endif

@@ -55,34 +55,14 @@ void AutomaticIrrigationDevice::handleEnvironmentalChange() {
     Serial.print("Nivel de agua crítico. Se cancela el riego.");
     return;
   }
-  bool hasInvalidLocalConditions = (temperature >= temperatureThreshold || humidity <= humidityThreshold);
-  int edgeResult = validateIrrigationConditions();
-  bool shouldIrrigate = false;
-
-  switch (edgeResult) {
-    case 0: // Edge dice no regar
-      Serial.println("Edge API indica no regar.");
-      shouldIrrigate = false;
-      break;
-    case 1: // Edge dice regar
-      shouldIrrigate = true;
-      break;
-    case 2: // Error en el endpoint
-    default:
-      Serial.println("Edge API no disponible. Usando solo condiciones locales.");
-      shouldIrrigate = hasInvalidLocalConditions;
-      break;
+  bool hasInvalidConditions = (temperature >= temperatureThreshold || humidity <= humidityThreshold);
+  if (hasInvalidConditions) {
+    relayActuator.handle(RelayActuator::TURN_ON_COMMAND);
+    Serial.println("Condición anómala: Activando riego.");
   }
-  if (shouldIrrigate) {
-    if (!relayActuator.getState()) {
-      relayActuator.handle(RelayActuator::TURN_ON_COMMAND);
-      Serial.println("Condición anómala: Activando riego.");
-    }
-  } else {
-    if (relayActuator.getState()) {
-      relayActuator.handle(RelayActuator::TURN_OFF_COMMAND);
-      Serial.println("Condición normal: Riego desactivado.");
-    }
+  else {
+    relayActuator.handle(RelayActuator::TURN_OFF_COMMAND);
+    Serial.println("Condición normal: Riego desactivado.");
   }
 }
 
@@ -91,13 +71,35 @@ void AutomaticIrrigationDevice::updateSensors() {
   ultrasonicSensor.updateData();
 }
 
-void AutomaticIrrigationDevice::sendSensorData() {
+void AutomaticIrrigationDevice::connectEdge() {
   if (comm && comm->isConnected()) {
+    // Recibimiento de datos
+    if (comm->hasData()) {
+      String incoming = comm->receiveData();
+      JsonDocument config;
+      DeserializationError err = deserializeJson(config, incoming);
+
+      if (!err) {
+        if (config.containsKey("temperature_max")) {
+          temperatureThreshold = config["temperature_max"].as<float>();
+          Serial.printf("Nuevo límite temperatura: %.2f°C\n", temperatureThreshold);
+        }
+        if (config.containsKey("humidity_min")) {
+          humidityThreshold = config["humidity_min"].as<float>();
+          Serial.printf("Nuevo límite humedad: %.2f%%\n", humidityThreshold);
+        }
+      } else {
+        Serial.println("Error al parsear JSON recibido.");
+      }
+    }
+
+    // Envio de datos
     float temp = dht22Sensor.getTemperature();
     float hum = dht22Sensor.getHumidity();
     float volume = ultrasonicSensor.getVolume();
 
     JsonDocument data;
+    data["sender"] = "device";
     data["temperature"] = temp;
     data["humidity"] = hum;
     data["volume"] = volume;
@@ -110,49 +112,6 @@ void AutomaticIrrigationDevice::sendSensorData() {
       Serial.println("Error enviando datos.");
     }
   }
-}
-
-void AutomaticIrrigationDevice::getThresholdData() {
-  if (comm && comm->isConnected()) {
-    String response = comm->receiveData(IRRIGATION_THRESHOLDS_ENDPOINT);
-    if (response.isEmpty()) {
-      Serial.println("Error recuperando datos de los limites para validacion local.");
-      return;
-    }
-
-    JsonDocument data;
-    DeserializationError error = deserializeJson(data, response);
-    if (error) {
-        Serial.print("Error parsing JSON: ");
-        Serial.println(error.c_str());
-        return;
-    }
-    // Set thresholds
-    temperatureThreshold = data["temperature_max"];
-    humidityThreshold = data["humidity_min"];
-
-    Serial.print("Valores de validacion local actualizados.");
-    return;
-  }
-}
-
-int AutomaticIrrigationDevice::validateIrrigationConditions() {
-    if (!comm) return 2;
-
-    String response = comm->receiveData(IRRIGATION_STATUS_ENDPOINT);
-    if (response.isEmpty()) return 2;
-
-    JsonDocument data;
-    DeserializationError error = deserializeJson(data, response);
-    if (error) {
-        Serial.print("Error parsing JSON: ");
-        Serial.println(error.c_str());
-        return 2;
-    }
-
-    bool shouldIrrigate = data["active"];
-    Serial.printf("Respuesta Edge API para riego: %s\n", shouldIrrigate ? "ACTIVAR" : "NO ACTIVAR");
-    return shouldIrrigate ? 1 : 0;
 }
 
 DHT22Sensor& AutomaticIrrigationDevice::getDHT() {

@@ -20,7 +20,6 @@ interface ICommunication {
     + sendData(data: string)
     + hasData()
     + receiveData()
-    + receiveData(url: string)
 }
 
 ' Clases abstractas
@@ -79,6 +78,7 @@ class AutomaticIrrigationDevice {
     - ledActuator: LedActuator
     - ultrasonicSensor: UltrasonicSensor
     - comm: ICommunication
+    - calculateTankVolumePercent(float distanceCm)
     + onEvent()
     + handleCommand()
     + handleVolumeChange()
@@ -90,22 +90,6 @@ class AutomaticIrrigationDevice {
     + sendSensorData()
 }
 
-class WiFiManager {
-    - ssid: char*
-    - password: char*
-    - serverUrl: string
-    - lastReconnectAttempt: long
-    - reconnectInterval: long
-    - rxBuffer: string
-    + begin()
-    + handle()
-    + isConnected()
-    + getAddress()
-    + sendData(data: string)
-    + hasData()
-    + receiveData()
-}
-
 class MQTTManager {
     - ssid: char*
     - password: char*
@@ -115,6 +99,8 @@ class MQTTManager {
     - rxBuffer: string
     - lastReconnectAttempt: long
     - reconnectInterval: long
+    - reconnect()
+    - setData(data: string)
     + begin()
     + handle()
     + isConnected()
@@ -122,7 +108,6 @@ class MQTTManager {
     + sendData(data: string)
     + hasData()
     + receiveData()
-    + receiveData(url: string)
 }
 
 ' Relaciones de implementación de interfaces
@@ -131,7 +116,6 @@ CommandHandler <|.. Actuator
 EventHandler <|.. Device
 CommandHandler <|.. Device
 ICommunication <|.. MQTTManager
-ICommunication <|.. WiFiManager
 
 ' Relaciones de herencia
 Sensor <|-- DHT22Sensor
