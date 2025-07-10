@@ -12,7 +12,7 @@ const char* mqttTopic = "iot/irrigation/data/iot-solutions64";
 unsigned long lastSensorUpdate = 0;
 unsigned long lastDataSend = 0;
 const unsigned long SENSOR_UPDATE_INTERVAL = 1000; // 1 segundos
-const unsigned long SEND_DATA_INTERVAL = 15000;  // 15 segundos
+const unsigned long SEND_DATA_INTERVAL = 10000;  // 10 segundos
 
 MQTTManager mqttManager(ssid, password, mqttServer, mqttPort, mqttTopic);
 AutomaticIrrigationDevice device(&mqttManager);

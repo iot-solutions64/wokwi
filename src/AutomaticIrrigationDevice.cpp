@@ -83,10 +83,12 @@ void AutomaticIrrigationDevice::connectEdge() {
         if (config.containsKey("temperature_max")) {
           temperatureThreshold = config["temperature_max"].as<float>();
           Serial.printf("Nuevo límite temperatura: %.2f°C\n", temperatureThreshold);
+          AutomaticIrrigationDevice::handleEnvironmentalChange();
         }
         if (config.containsKey("humidity_min")) {
           humidityThreshold = config["humidity_min"].as<float>();
           Serial.printf("Nuevo límite humedad: %.2f%%\n", humidityThreshold);
+          AutomaticIrrigationDevice::handleEnvironmentalChange();
         }
       } else {
         Serial.println("Error al parsear JSON recibido.");
